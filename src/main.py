@@ -2,6 +2,8 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
+from src.schedule.router import router as schedule_router
+
 app = FastAPI(title="UniversitySchedule")
 
 app.add_middleware(
@@ -11,6 +13,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(schedule_router)
 
 if __name__ == "__main__":
     uvicorn.run(
