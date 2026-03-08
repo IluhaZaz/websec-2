@@ -5,15 +5,17 @@ from pydantic import BaseModel
 
 
 class LessonType(Enum):
-    practice = "practice"
-    laboratory = "laboratory"
-    lection = "lection"
+    practice = "Практика"
+    laboratory = "Лабораторная"
+    lection = "Лекция"
+    other = "Другое"
 
 
 class Lesson(BaseModel):
     name: str
-    location: str
+    place: str
     teacher: str
     type: LessonType
-    lesson_num: int
-    groups: Optional[list[str]]
+    lesson_indx: int
+    caption: Optional[str] = None
+    groups: Optional[list[str]] = None

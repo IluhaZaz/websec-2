@@ -1,10 +1,15 @@
 import asyncio
 import re
+from pprint import pprint
+from typing import Optional
 
 import httpx
 from bs4 import BeautifulSoup
 
 from src.schedule.config import GatewayConfig
+from src.schemas.day import Day
+from src.schemas.lesson import Lesson, LessonType
+from src.schemas.week import Week
 
 
 class ScheduleGateway:
@@ -28,7 +33,6 @@ class ScheduleGateway:
                 faculty_id = match.group(1)
 
                 res.append(faculty_id)
-        print(res)
         return res
 
     async def get_groups_ids(self) -> dict[str, int]:
@@ -56,9 +60,65 @@ class ScheduleGateway:
                             name = group.find("span").text
                             id_ = re.search(r'groupId=(\d+)', group.get("href")).group(1)
 
-                            course_dict[name] = id_
+                            course_dict[name] = int(id_)
                         res.update(course_dict)
                     else:
                         print(resp.content)
         return res
+
+    async def get_week(self, group_id: int, week_num: Optional[int] = None) -> Week:
+        schedule_link = f"{self.api_base}/rasp?groupId={group_id}"
+        print(schedule_link)
+        week = Week()
+
+        if week_num:
+            week.num = week_num
+            schedule_link += f"&selectedWeek={week_num}"
+
+        async with httpx.AsyncClient() as session:
+            resp = await session.get(schedule_link)
+        schedule_page = resp.content.decode("utf-8")
+
+        soup = BeautifulSoup(schedule_page, 'html.parser')
+
+        week_num = soup.find("span", class_="week-nav-current_week").text.strip()
+        week.num = int(week_num.split()[0].strip())
+
+        item_cnt = 0
+        for item in soup.find_all("div", class_="schedule__item"):
+            if "schedule__head" in item.get("class"):
+                continue
+
+            lessons_schemas = []
+            lessons = item.find_all("div", class_="schedule__lesson")
+            for lesson in lessons:
+                type_ = lesson.find("div", class_="schedule__lesson-type-chip").text.strip()
+                name = lesson.find("div", class_="schedule__discipline").text.strip()
+                teacher = lesson.find("div", class_="schedule__teacher").text.strip()
+                place = lesson.find("div", class_="schedule__place").text.strip()
+                groups = [g.text.strip() for g in lesson.find_all("a", class_="schedule__group")]
+
+                caption = lesson.find("span", class_="caption-text")
+                if caption:
+                    caption = caption.text.strip()
+
+                lesson_schema = Lesson(
+                    type=LessonType(type_),
+                    lesson_indx=item_cnt % 6,
+                    name=name,
+                    teacher=teacher,
+                    place=place,
+                    groups=groups,
+                    caption=caption
+                )
+                lessons_schemas.append(lesson_schema)
+
+            week[item_cnt%6][item_cnt//6] = lessons_schemas
+
+            item_cnt += 1
+
+        return week
+
+
+
 
