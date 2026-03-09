@@ -23,14 +23,30 @@ async def index(request: Request, backend: BackendConnectionDepends) -> _Templat
         }
     )
 
-@router.get("/week")
-async def get_week_table(
+@router.get("/week/group")
+async def get_week_table_by_group(
     request: Request,
     group: str,
     backend: BackendConnectionDepends,
-    week_num: Optional[str]=None,
+    week_num: Optional[str] = None
 ) -> _TemplateResponse:
-    week = await backend.get_week(group, week_num)
+    week = await backend.get_week_by_group(group, week_num)
+    return templates.TemplateResponse(
+        "schedule_table.html",
+        {
+            "request": request,
+            "week": week
+        }
+    )
+
+@router.get("/week/teacher")
+async def get_week_table_by_teacher(
+    request: Request,
+    teacher_id: str,
+    backend: BackendConnectionDepends,
+    week_num: Optional[str] = None
+) -> _TemplateResponse:
+    week = await backend.get_week_by_teacher(teacher_id, week_num)
     return templates.TemplateResponse(
         "schedule_table.html",
         {

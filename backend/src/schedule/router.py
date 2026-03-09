@@ -7,12 +7,19 @@ from backend.src.schemas.week import Week
 
 router = APIRouter(prefix="/schedule")
 
-@router.get("/week")
+@router.get("/week/teacher")
+async def get_week(
+        teacher_id: str,
+        service: ScheduleServiceDepends,
+        week_num: Optional[str]=None) -> Week:
+    return await service.get_week_by_teacher_id(teacher_id, week_num)
+
+@router.get("/week/group")
 async def get_week(
         group: str,
         service: ScheduleServiceDepends,
         week_num: Optional[str]=None) -> Week:
-    return await service.get_week(group, week_num)
+    return await service.get_week_by_group(group, week_num)
 
 @router.post("/ids")
 async def save_groups_ids(

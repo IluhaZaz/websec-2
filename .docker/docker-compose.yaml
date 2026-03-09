@@ -2,7 +2,7 @@ services:
   backend:
     image: backend
     restart: unless-stopped
-    pull_policy: never
+    pull_policy: always
     build:
       context: ..
       dockerfile: .docker/DockerfileBackend
@@ -17,7 +17,7 @@ services:
   frontend:
     image: frontend
     restart: unless-stopped
-    pull_policy: never
+    pull_policy: always
     build:
       context: ..
       dockerfile: .docker/DockerfileFrontend

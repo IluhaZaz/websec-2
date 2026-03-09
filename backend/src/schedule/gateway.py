@@ -12,10 +12,11 @@ from backend.src.schemas.week import Week
 class ScheduleGateway:
     def __init__(self, config: GatewayConfig):
         self.api_base = config.api_base
+        self.timeout = httpx.Timeout(30.0, connect=10.0)
 
     async def get_faculties_ids(self) -> list[str]:
         res = []
-        async with httpx.AsyncClient() as session:
+        async with httpx.AsyncClient(timeout=self.timeout) as session:
             faculties_page = await session.get(f"{self.api_base}/rasp")
 
             soup = BeautifulSoup(faculties_page.content.decode("utf-8"), 'html.parser')
@@ -37,7 +38,7 @@ class ScheduleGateway:
 
         res = dict()
 
-        async with httpx.AsyncClient() as session:
+        async with httpx.AsyncClient(timeout=self.timeout) as session:
             for faculty_id in faculties_ids:
                 for course_num in range(1, 7):
                     course_link = f"{self.api_base}/rasp/faculty/{faculty_id}?course={course_num}"
@@ -63,15 +64,27 @@ class ScheduleGateway:
                         print(resp.content)
         return res
 
-    async def get_week(self, group_id: int, week_num: Optional[int] = None) -> Week:
-        schedule_link = f"{self.api_base}/rasp?groupId={group_id}"
+    async def get_week(
+            self,
+            id_: str,
+            week_num: Optional[int] = None,
+            is_group_id: bool = True
+    ) -> Week:
+        if is_group_id:
+            schedule_link = f"{self.api_base}/rasp?groupId={id_}"
+        else:
+            schedule_link = f"{self.api_base}/rasp?staffId={id_}"
+
+        return await self._get_week(schedule_link, week_num)
+
+    async def _get_week(self, schedule_link: str, week_num: Optional[int] = None) -> Week:
         week = Week()
 
         if week_num:
             week.num = week_num
             schedule_link += f"&selectedWeek={week_num}"
 
-        async with httpx.AsyncClient() as session:
+        async with httpx.AsyncClient(timeout=self.timeout) as session:
             resp = await session.get(schedule_link)
         schedule_page = resp.content.decode("utf-8")
 
@@ -90,7 +103,22 @@ class ScheduleGateway:
             for lesson in lessons:
                 type_ = lesson.find("div", class_="schedule__lesson-type-chip").text.strip()
                 name = lesson.find("div", class_="schedule__discipline").text.strip()
-                teacher = lesson.find("div", class_="schedule__teacher").text.strip()
+
+                teacher_div = lesson.find("div", class_="schedule__teacher")
+                teacher = None
+                teacher_id = None
+                if teacher_div:
+                    teacher = teacher_div.text.strip()
+
+                    teacher_id=None
+                    teacher_link = teacher_div.find("a", class_="caption-text")
+                    if teacher_link:
+                        teacher_id = re.search(
+                            r'staffId=(\d+)',
+                            teacher_link.get("href")
+                        ).group(1)
+
+
                 place = lesson.find("div", class_="schedule__place").text.strip()
                 groups = [g.text.strip() for g in lesson.find_all("a", class_="schedule__group")]
 
@@ -103,6 +131,7 @@ class ScheduleGateway:
                     lesson_indx=item_cnt % 6,
                     name=name,
                     teacher=teacher,
+                    teacher_id=teacher_id,
                     place=place,
                     groups=groups,
                     caption=caption

@@ -25,9 +25,20 @@ class ScheduleService:
         data = await self.repository.get_keys()
         return data
 
-    async def get_week(self, group: str, week_num: Optional[int] = None) -> Week:
+    async def get_week_by_group(
+            self,
+            group: str,
+            week_num: Optional[int] = None
+    ) -> Week:
         id_ = await self.repository.get(group)
-        id_ = int(id_)
+        id_ = id_.decode("utf-8")
         if id_ is not None:
             return await self.gateway.get_week(id_, week_num)
+
+    async def get_week_by_teacher_id(
+            self,
+            teacher_id: str,
+            week_num: Optional[int] = None
+    ) -> Week:
+            return await self.gateway.get_week(teacher_id, week_num, is_group_id=False)
 

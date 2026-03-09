@@ -118,6 +118,10 @@
         margin-bottom: 4px;
     }
 
+    .lesson-item a{
+        color: #0088ff;
+    }
+
     .lesson-item small {
         font-size: 11px;
         color: rgba(255, 255, 255, 0.7);
@@ -126,7 +130,7 @@
         gap: 4px;
     }
 
-    .lesson-item small::before {
+    .lesson-item > small::before {
         content: "•";
         color: #9f4fbf;
         font-size: 14px;
@@ -154,6 +158,19 @@
 
     .htmx-request.loader {
         display: block;
+    }
+
+    .group-refs{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .group-refs small {
+    display: block;  /* каждая ссылка на новой строке */
+    }
+
+    .group-refs small a {
+    display: block;  /* каждая ссылка на новой строке */
     }
 
     @keyframes spin {
@@ -240,7 +257,7 @@
     }
 }
 </style>
-
+<div class="loader"></div>
 <div class="schedule-container" style="overflow-x: auto;">
     <table class="week-table">
         <thead>
@@ -272,10 +289,35 @@
                     <div class="lesson-item" {% if lesson.type %}data-type="{{ lesson.type|lower }}"
                          {% endif %}>
                         <div><strong>{{ lesson.name }}</strong></div>
-                        <small>{{ lesson.teacher }}</small>
+                        {% if lesson.teacher %}
+                        <small>
+                            {% if lesson.teacher_id %}
+                            <a
+                                hx-get="/week/teacher?teacher_id={{lesson.teacher_id}}"
+                                hx-target="#schedule-content"
+                                hx-include="#week-input"
+                        >{{ lesson.teacher }}</a>
+                            {% else %}
+                            <div>{{ lesson.teacher }}</div>
+                            {% endif %}
+                        </small>
+                        {% endif %}
                         <small>{{ lesson.place }}</small>
                         {% if lesson.caption %}
                         <div><small style="color: #9f4fbf;">{{ lesson.caption }}</small></div>
+                        {% endif %}
+                        {% if lesson.groups %}
+                        <div class="group-refs">
+                            <small>
+                                {% for group in lesson.groups %}
+                                <a
+                                        hx-get="/week/group?group={{group.split()[0].strip()}}"
+                                        hx-target="#schedule-content"
+                                        hx-include="#week-input">{{ group }}
+                                </a>
+                                {% endfor %}
+                            </small>
+                        </div>
                         {% endif %}
                     </div>
                     {% endfor %}
@@ -292,6 +334,4 @@
         {% endfor %}
         </tbody>
     </table>
-
-    <div class="loader"></div>
 </div>
