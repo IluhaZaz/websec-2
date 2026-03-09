@@ -1,11 +1,17 @@
-<!-- templates/schedule.html -->
 <!DOCTYPE html>
 <html>
 <head>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        * {
+            background-color: rgb(20, 10, 20);
+            color: azure;
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
 </head>
 <body>
-    <h1>Расписание</h1>
+    <h1 style="text-align: center;">Расписание</h1>
 
     <select name="group" id="group-select">
         {% for g in groups %}
