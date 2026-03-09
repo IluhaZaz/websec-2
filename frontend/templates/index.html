@@ -4,37 +4,135 @@
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <style>
         * {
-            background-color: rgb(20, 10, 20);
-            color: azure;
-            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a0f1f 0%, #2d1a33 100%);
+            color: #e0e0e0;
+            font-family: 'Inter', 'Courier New', monospace;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, #fff, #a8a8a8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        select, input, button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select {
+    min-width: 200px;
+    appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.5rem;
+}
+
+        select:hover, input:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        button {
+            background: linear-gradient(45deg, #6b2b8b, #9f4fbf);
+            border: none;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(111, 45, 189, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(111, 45, 189, 0.6);
+        }
+
+        input {
+            width: 150px;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        #schedule-content {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #week-input{
+            width: 200px
         }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">Расписание</h1>
+<div class="container">
+    <h1>Расписание</h1>
 
-    <select name="group" id="group-select">
-        {% for g in groups %}
-        <option value="{{ g }}">
-            {{ g }}
-        </option>
-        {% endfor %}
-    </select>
+    <div class="controls">
+        <select name="group" id="group-select">
+            {% for g in groups %}
+            <option value="{{ g }}" style="background: #2d1a33;">
+                {{ g }}
+            </option>
+            {% endfor %}
+        </select>
 
-    <button
-    hx-get="/week"
-    hx-target="#schedule-content"
-    hx-include="#group-select, #week-input">
-        Получить расписание</button>
+        <input type="number"
+               id="week-input"
+               name="week_num"
+               value="{{ week_num or '' }}"
+               placeholder="Неделя №">
 
-    <input type="number"
-           id="week-input"
-           name="week_num"
-           value="{{ week_num or '' }}"
-           placeholder="Номер недели">
+        <button
+                hx-get="/week"
+                hx-target="#schedule-content"
+                hx-include="#group-select, #week-input"
+                hx-indicator=".loader">
+            🔍 Получить расписание
+        </button>
+    </div>
 
     <div id="schedule-content">
-
+        <!-- Содержимое будет загружено сюда -->
     </div>
+</div>
 </body>
 </html>

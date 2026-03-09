@@ -1,85 +1,249 @@
 <style>
-    .week-table {
-        width: 100%;
-        table-layout: fixed;
+    .schedule-container {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     }
 
-    .week-table th,
+    .week-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .week-table thead tr {
+        background: linear-gradient(90deg, rgba(111, 45, 189, 0.3), rgba(159, 79, 191, 0.2));
+    }
+
+    .week-table th {
+        padding: 1rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #fff;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
     .week-table td {
-        width: calc(100% / 7);
         padding: 0;
-        border: 1px solid #ddd;
+        border: 1px solid rgba(255, 255, 255, 0.05);
         vertical-align: top;
-        height: 120px;
+        height: 140px;
+        transition: background-color 0.3s ease;
+    }
+
+    .week-table td:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .time-cell {
+        font-weight: 600;
+        text-align: center;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(111, 45, 189, 0.2);
+        color: #fff;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        border-right: 2px solid rgba(255, 255, 255, 0.1);
     }
 
     .lessons-container {
         display: flex;
         flex-direction: column;
         height: 100%;
-        min-height: 120px;
+        min-height: 140px;
+        gap: 2px;
+        padding: 2px;
     }
 
     .lesson-item {
         flex: 1;
         padding: 8px;
-        border-radius: 0;
-        border-bottom: 1px solid #ddd;
+        border-radius: 8px;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.02);
+        border-left: 4px solid transparent;
     }
 
-    .lesson-item:last-child {
-        border-bottom: none;
+    .lesson-item:hover {
+        transform: scale(1.02);
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 10;
     }
 
-    .lesson-item:only-child {
-        justify-content: center;
+    .lesson-item[data-type="лекция"] {
+        border-left-color: #00ffaa;
+        background: linear-gradient(90deg, rgba(0, 255, 170, 0.1), transparent);
+    }
+
+    .lesson-item[data-type="практика"] {
+        border-left-color: #0088ff;
+        background: linear-gradient(90deg, rgba(0, 136, 255, 0.1), transparent);
+    }
+
+    .lesson-item[data-type="лабораторная"] {
+        border-left-color: #f700ff;
+        background: linear-gradient(90deg, rgba(247, 0, 255, 0.1), transparent);
+    }
+
+    .lesson-item[data-type="другое"] {
+        border-left-color: #ffbb00;
+        background: linear-gradient(90deg, rgba(255, 187, 0, 0.1), transparent);
     }
 
     .lesson-item > div {
         line-height: 1.4;
-        margin: 2px 0;
+        margin: 1px 0;
     }
 
     .lesson-item strong {
         font-size: 14px;
         display: block;
+        color: #fff;
+        font-weight: 600;
+        margin-bottom: 4px;
     }
 
     .lesson-item small {
         font-size: 11px;
+        color: rgba(255, 255, 255, 0.7);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .lesson-item small::before {
+        content: "•";
+        color: #9f4fbf;
+        font-size: 14px;
+    }
+
+    .empty-lesson {
+        background: transparent;
+        min-height: 140px;
+    }
+
+    .loader {
+        display: none;
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: #9f4fbf;
+        animation: spin 1s ease-in-out infinite;
+        margin: 20px auto;
+    }
+
+    .htmx-request .loader {
+        display: block;
+    }
+
+    .htmx-request.loader {
+        display: block;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+        body {
+            padding: 1rem;
+        }
+
+        .week-table {
+            font-size: 12px;
+        }
+
+        .lesson-item strong {
+            font-size: 11px;
+        }
+
+        .lesson-item small {
+            font-size: 9px;
+        }
+
+        .time-cell {
+            font-size: 10px;
+        }
+    }
+@media (max-width: 768px) {
+    .schedule-container {
+        padding: 0.5rem;
+        overflow-x: auto;
+    }
+
+    .week-table {
+        min-width: 600px;
+    }
+
+    .week-table td {
+        height: 100px;
+        min-width: 80px;
+    }
+
+    .lesson-item {
+        padding: 4px;
+    }
+
+    .lesson-item strong {
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .lesson-item small {
+        font-size: 9px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .time-cell {
-        font-weight: bold;
-        text-align: center;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        font-size: 10px;
+        white-space: nowrap;
+        padding: 0 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .week-table {
+        min-width: 500px;
     }
 
-    .lesson-item[data-type="лекция"] {
-        box-shadow: inset 3px 0px rgb(0, 255, 170);
+    .week-table td {
+        min-width: 70px;
+        height: 90px;
     }
 
-    .lesson-item[data-type="практика"] {
-        box-shadow: inset 3px 0px rgb(0, 136, 255);
+    .lesson-item strong {
+        font-size: 10px;
     }
 
-    .lesson-item[data-type="лабораторная"] {
-        box-shadow: inset 3px 0px rgb(247, 0, 255);
+    .lesson-item small {
+        font-size: 8px;
     }
-
-    .lesson-item[data-type="другое"] {
-        box-shadow: inset 3px 0px rgb(255, 187, 0);
-    }
+}
 </style>
 
-<table class="week-table" border="1">
-    <thead>
+<div class="schedule-container" style="overflow-x: auto;">
+    <table class="week-table">
+        <thead>
         <tr>
             <th>Время</th>
             <th>ПН</th>
@@ -89,9 +253,10 @@
             <th>ПТ</th>
             <th>СБ</th>
         </tr>
-    </thead>
-    <tbody>
-        {% set times = ['8:00-9:35', '9:45-11:20', '11:30-13:05', '13:30-15:05', '15:15-16:50', '17:00-18:35'] %}
+        </thead>
+        <tbody>
+        {% set times = ['8:00-9:35', '9:45-11:20', '11:30-13:05', '13:30-15:05', '15:15-16:50',
+        '17:00-18:35'] %}
 
         {% for lesson_idx in range(6) %}
         <tr>
@@ -103,23 +268,30 @@
             <td>
                 <div class="lessons-container">
                     {% if week.days[day_idx] and week.days[day_idx].lessons[lesson_idx] %}
-                        {% for lesson in week.days[day_idx].lessons[lesson_idx] %}
-                        <div class="lesson-item" {% if lesson.type %}data-type="{{ lesson.type|lower }}"{% endif %}>
-                            <div><strong style="font-size: medium">{{ lesson.name }}</strong></div>
-                            <small>{{ lesson.teacher }}</small>
-                            <small>{{ lesson.place }}</small>
-                            {% if lesson.caption %}<div><small>{{ lesson.caption }}</small></div>{% endif %}
-                        </div>
-                        {% endfor %}
+                    {% for lesson in week.days[day_idx].lessons[lesson_idx] %}
+                    <div class="lesson-item" {% if lesson.type %}data-type="{{ lesson.type|lower }}"
+                         {% endif %}>
+                        <div><strong>{{ lesson.name }}</strong></div>
+                        <small>{{ lesson.teacher }}</small>
+                        <small>{{ lesson.place }}</small>
+                        {% if lesson.caption %}
+                        <div><small style="color: #9f4fbf;">{{ lesson.caption }}</small></div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
                     {% else %}
-                        <div class="lesson-item" style="justify-content: flex-start; background: transparent;">
-                            <div></div>
-                        </div>
+                    <div class="lesson-item empty-lesson"
+                         style="background: transparent; border-left-color: transparent;">
+                        <div style="opacity: 0.3; text-align: center;"></div>
+                    </div>
                     {% endif %}
                 </div>
             </td>
             {% endfor %}
         </tr>
         {% endfor %}
-    </tbody>
-</table>
+        </tbody>
+    </table>
+
+    <div class="loader"></div>
+</div>
