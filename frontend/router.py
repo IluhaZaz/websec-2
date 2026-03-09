@@ -3,6 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
+from starlette.templating import _TemplateResponse
 
 from frontend.depends import BackendConnectionDepends
 
@@ -12,9 +13,8 @@ BASE_DIR = Path(__file__).parent
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 @router.get("/")
-async def index(request: Request, backend: BackendConnectionDepends):
+async def index(request: Request, backend: BackendConnectionDepends) -> _TemplateResponse:
     groups = await backend.get_groups()
-    print(type(groups))
     return templates.TemplateResponse(
         name="index.html",
         request=request,
@@ -29,7 +29,7 @@ async def get_week_table(
     group: str,
     backend: BackendConnectionDepends,
     week_num: Optional[str]=None,
-) -> templates.TemplateResponse:
+) -> _TemplateResponse:
     week = await backend.get_week(group, week_num)
     return templates.TemplateResponse(
         "schedule_table.html",

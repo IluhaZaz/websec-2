@@ -1,17 +1,10 @@
-from pathlib import Path
-
 import uvicorn
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
 from frontend.router import router
 
 app = FastAPI(title="SSAUScheduleFrontend")
-
-# BASE_DIR = Path(__file__).parent
-#
-# app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
 app.add_middleware(
     CORSMiddleware,

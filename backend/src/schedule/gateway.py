@@ -65,7 +65,6 @@ class ScheduleGateway:
 
     async def get_week(self, group_id: int, week_num: Optional[int] = None) -> Week:
         schedule_link = f"{self.api_base}/rasp?groupId={group_id}"
-        print(schedule_link)
         week = Week()
 
         if week_num:
