@@ -1,8 +1,8 @@
 from typing import Optional
 
-from src.schedule.gateway import ScheduleGateway
-from src.schedule.repository import ScheduleRepository
-from src.schemas.week import Week
+from backend.src.schedule.gateway import ScheduleGateway
+from backend.src.schedule.repository import ScheduleRepository
+from backend.src.schemas.week import Week
 
 
 class ScheduleService:
@@ -19,6 +19,10 @@ class ScheduleService:
 
         await self.repository.set_keys(data)
 
+        return data
+
+    async def get_groups(self) -> list[str]:
+        data = await self.repository.get_keys()
         return data
 
     async def get_week(self, group: str, week_num: Optional[int] = None) -> Week:

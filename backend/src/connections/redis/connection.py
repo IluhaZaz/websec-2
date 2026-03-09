@@ -2,7 +2,7 @@ from typing import Any, Optional
 
 from redis.asyncio import Redis
 
-from src.connections.redis.config import RedisConfig
+from backend.src.connections.redis.config import RedisConfig
 
 
 class RedisConnection:

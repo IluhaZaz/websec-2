@@ -1,15 +1,12 @@
-import asyncio
 import re
-from pprint import pprint
 from typing import Optional
 
 import httpx
 from bs4 import BeautifulSoup
 
-from src.schedule.config import GatewayConfig
-from src.schemas.day import Day
-from src.schemas.lesson import Lesson, LessonType
-from src.schemas.week import Week
+from backend.src.schedule.config import GatewayConfig
+from backend.src.schemas.lesson import Lesson, LessonType
+from backend.src.schemas.week import Week
 
 
 class ScheduleGateway:

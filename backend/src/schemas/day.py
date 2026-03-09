@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from src.schemas.lesson import Lesson
+from backend.src.schemas.lesson import Lesson
 
 
 class Day(BaseModel):

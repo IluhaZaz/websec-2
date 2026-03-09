@@ -1,6 +1,6 @@
 from typing import Any
 
-from src.connections.redis.connection import RedisConnection
+from backend.src.connections.redis.connection import RedisConnection
 
 
 class ScheduleRepository:
@@ -14,6 +14,12 @@ class ScheduleRepository:
     async def set_keys(self, data: dict):
         for key, val in data.items():
             await self.set(key, val)
+
+    async def get_keys(self) -> list[str]:
+        async with self.redis as client:
+            keys = await client.keys("*")
+        keys = [key.decode("utf-8") for key in keys]
+        return keys
 
     async def get(self, key: Any) -> Any:
         async with self.redis as client:

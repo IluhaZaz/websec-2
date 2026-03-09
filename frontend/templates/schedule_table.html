@@ -1,0 +1,43 @@
+<!-- templates/partials/schedule_table.html -->
+{% if week and week.days %}
+<table border="1" cellpadding="5" style="border-collapse: collapse; width: 100%;">
+    <thead>
+        <tr>
+            <th>Время</th>
+            <th>ПН</th>
+            <th>ВТ</th>
+            <th>СР</th>
+            <th>ЧТ</th>
+            <th>ПТ</th>
+            <th>СБ</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set times = ['8:00-9:35', '9:45-11:20', '11:30-13:05', '13:30-15:05', '15:15-16:50', '17:00-18:35'] %}
+
+        {% for lesson_idx in range(6) %}
+        <tr>
+            <td><strong>{{ times[lesson_idx] }}</strong></td>
+
+            {% for day_idx in range(6) %}
+            <td>
+                {% if week.days[day_idx] and week.days[day_idx].lessons[lesson_idx] %}
+                    {% for lesson in week.days[day_idx].lessons[lesson_idx] %}
+                    <div style="margin-bottom: 10px; padding: 5px; background: #f5f5f5; border-radius: 3px;">
+                        <div><strong>{{ lesson.name }}</strong></div>
+                        <div>{{ lesson.teacher }}</div>
+                        <div>{{ lesson.place }}</div>
+                        {% if lesson.type %}<div><small>{{ lesson.type.value }}</small></div>{% endif %}
+                        {% if lesson.caption %}<div><small>{{ lesson.caption }}</small></div>{% endif %}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Нет данных для отображения</p>
+{% endif %}

@@ -2,12 +2,12 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from src.connections.redis.config import RedisConfig
-from src.connections.redis.connection import RedisConnection
-from src.schedule.config import GatewayConfig
-from src.schedule.gateway import ScheduleGateway
-from src.schedule.repository import ScheduleRepository
-from src.schedule.service import ScheduleService
+from backend.src.connections.redis.config import RedisConfig
+from backend.src.connections.redis.connection import RedisConnection
+from backend.src.schedule.config import GatewayConfig
+from backend.src.schedule.gateway import ScheduleGateway
+from backend.src.schedule.repository import ScheduleRepository
+from backend.src.schedule.service import ScheduleService
 
 
 async def get_redis() -> RedisConnection:
