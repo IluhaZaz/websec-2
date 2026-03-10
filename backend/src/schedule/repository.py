@@ -11,7 +11,7 @@ class ScheduleRepository:
         async with self.redis as client:
             await client.set(key, value)
 
-    async def set_keys(self, data: dict):
+    async def set_keys(self, data: dict) -> None:
         for key, val in data.items():
             await self.set(key, val)
 
@@ -21,7 +21,7 @@ class ScheduleRepository:
         keys = [key.decode("utf-8") for key in keys]
         return keys
 
-    async def get(self, key: Any) -> Any:
+    async def get(self, key: Any) -> bytes:
         async with self.redis as client:
             return await client.get(key)
 

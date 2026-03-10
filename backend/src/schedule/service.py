@@ -1,5 +1,7 @@
 from typing import Optional
 
+from fastapi import HTTPException
+
 from backend.src.schedule.gateway import ScheduleGateway
 from backend.src.schedule.repository import ScheduleRepository
 from backend.src.schemas.week import Week
@@ -14,7 +16,7 @@ class ScheduleService:
         self.gateway = gateway
         self.repository = repository
 
-    async def save_groups_ids(self):
+    async def save_groups_ids(self) -> dict[str, int]:
         data = await self.gateway.get_groups_ids()
 
         await self.repository.set_keys(data)
@@ -34,6 +36,7 @@ class ScheduleService:
         id_ = id_.decode("utf-8")
         if id_ is not None:
             return await self.gateway.get_week(id_, week_num)
+        raise HTTPException(404, f"No such group {group}")
 
     async def get_week_by_teacher_id(
             self,

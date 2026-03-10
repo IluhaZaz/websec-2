@@ -120,6 +120,7 @@
 
     .lesson-item a{
         color: #0088ff;
+        cursor: pointer;
     }
 
     .lesson-item small {
@@ -166,11 +167,11 @@
     }
 
     .group-refs small {
-    display: block;  /* каждая ссылка на новой строке */
+    display: block;
     }
 
     .group-refs small a {
-    display: block;  /* каждая ссылка на новой строке */
+    display: block;
     }
 
     @keyframes spin {
@@ -293,6 +294,7 @@
                         <small>
                             {% if lesson.teacher_id %}
                             <a
+                                onclick="setScheduleTitle('{{ lesson.teacher }}');  setWeekNum({{ week.num if week else '' }});"
                                 hx-get="/week/teacher?teacher_id={{lesson.teacher_id}}"
                                 hx-target="#schedule-content"
                                 hx-include="#week-input"
@@ -311,6 +313,10 @@
                             <small>
                                 {% for group in lesson.groups %}
                                 <a
+                                        onclick="
+                                        setScheduleTitle('{{ group }}');
+                                        setWeekNum({{ week.num if week else '' }});
+                                        setGroup('{{ group.split()[0].strip() }}')"
                                         hx-get="/week/group?group={{group.split()[0].strip()}}"
                                         hx-target="#schedule-content"
                                         hx-include="#week-input">{{ group }}
@@ -335,3 +341,13 @@
         </tbody>
     </table>
 </div>
+<script>
+    function setWeekNum(num) {
+        document.getElementById('week-input').value = num;
+        console.log(num);
+    }
+
+    function setGroup(group) {
+        document.getElementById('group-select').value = group;
+    }
+</script>
